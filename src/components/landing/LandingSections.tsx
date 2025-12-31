@@ -45,13 +45,13 @@ export function HeroSection() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link to="/students">
+              <Link to="/connect-wallet">
                 <Button variant="hero" size="lg">
                   <GraduationCap className="h-5 w-5" />
                   Get Started as Student
                 </Button>
               </Link>
-              <Link to="/institutions">
+              <Link to="/connect-wallet">
                 <Button variant="hero-outline" size="lg">
                   <Building2 className="h-5 w-5" />
                   Issue Credentials
@@ -177,7 +177,7 @@ export function ForWhomSection() {
       title: "For Students",
       description: "Own your academic identity forever. Store, manage, and selectively share your credentials with full control over privacy and access.",
       features: ["Permanent credential ownership", "Selective disclosure", "Privacy controls"],
-      href: "/students",
+      href: "/connect-wallet",
       color: "text-accent",
       bgColor: "bg-accent/10",
     },
@@ -186,7 +186,7 @@ export function ForWhomSection() {
       title: "For Institutions",
       description: "Issue tamper-proof credentials with cryptographic signatures. Maintain immutable records and participate in decentralized governance.",
       features: ["Cryptographic issuance", "Revocation management", "Audit trails"],
-      href: "/institutions",
+      href: "/connect-wallet",
       color: "text-primary",
       bgColor: "bg-primary/10",
     },
@@ -195,7 +195,7 @@ export function ForWhomSection() {
       title: "For Employers",
       description: "Instantly verify credentials without intermediaries. Access verification via intuitive UI or integrate with our powerful API.",
       features: ["Instant verification", "QR code scanning", "API integration"],
-      href: "/employers",
+      href: "/verify",
       color: "text-info",
       bgColor: "bg-info/10",
     },
@@ -377,9 +377,9 @@ export function CTASection() {
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
-            <Link to="/contact">
+            <Link to="/how-it-works">
               <Button variant="hero-outline" size="lg">
-                Contact Sales
+                Learn More
               </Button>
             </Link>
           </div>
