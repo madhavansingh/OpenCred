@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { PublicLayout } from "@/components/layout/PublicLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useWallet, UserRole } from "@/contexts/WalletContext";
 import {
   Wallet,
-  Shield,
   ChevronRight,
   HelpCircle,
   ExternalLink,
@@ -16,36 +16,11 @@ import {
   GraduationCap,
   Building2,
   Briefcase,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 
-const walletOptions = [
-  {
-    id: "metamask",
-    name: "MetaMask",
-    description: "Connect using MetaMask browser extension or mobile app",
-    icon: "🦊",
-    popular: true,
-    platforms: ["browser", "mobile"],
-  },
-  {
-    id: "walletconnect",
-    name: "WalletConnect",
-    description: "Scan with any WalletConnect-compatible wallet",
-    icon: "🔗",
-    popular: true,
-    platforms: ["mobile"],
-  },
-  {
-    id: "coinbase",
-    name: "Coinbase Wallet",
-    description: "Connect using Coinbase Wallet",
-    icon: "💙",
-    popular: false,
-    platforms: ["browser", "mobile"],
-  },
-];
-
-const userTypes = [
+const userTypes: { id: UserRole; title: string; description: string; icon: typeof GraduationCap; href: string }[] = [
   {
     id: "student",
     title: "Student",
@@ -71,19 +46,21 @@ const userTypes = [
 
 export default function ConnectWallet() {
   const navigate = useNavigate();
-  const [step, setStep] = useState<"wallet" | "type">("wallet");
-  const [selectedWallet, setSelectedWallet] = useState<string | null>(null);
-  const [isConnecting, setIsConnecting] = useState(false);
+  const location = useLocation();
+  const { isConnected, isConnecting, walletAddress, connect, hasMetaMask } = useWallet();
+  const [step, setStep] = useState<"wallet" | "type">(isConnected ? "type" : "wallet");
 
-  const handleWalletConnect = async (walletId: string) => {
-    setSelectedWallet(walletId);
-    setIsConnecting(true);
-    
-    // Simulate connection delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    setIsConnecting(false);
-    setStep("type");
+  const handleWalletConnect = async () => {
+    const success = await connect();
+    if (success) {
+      setStep("type");
+    }
+  };
+
+  const handleUserTypeSelect = async (role: UserRole, href: string) => {
+    await connect(role);
+    const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
+    navigate(from || href);
   };
 
   const handleUserTypeSelect = (href: string) => {
