@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
 import ConnectWallet from "./pages/ConnectWallet";
 import VerifyCredential from "./pages/VerifyCredential";
 import HowItWorks from "./pages/HowItWorks";
@@ -26,6 +27,7 @@ const App = () => (
         <Routes>
           {/* Public Pages */}
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/connect-wallet" element={<ConnectWallet />} />
           <Route path="/verify" element={<VerifyCredential />} />
