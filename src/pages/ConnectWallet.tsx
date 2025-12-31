@@ -10,8 +10,6 @@ import {
   ChevronRight,
   HelpCircle,
   ExternalLink,
-  Smartphone,
-  Laptop,
   CheckCircle,
   GraduationCap,
   Building2,
@@ -47,7 +45,7 @@ const userTypes: { id: UserRole; title: string; description: string; icon: typeo
 export default function ConnectWallet() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isConnected, isConnecting, walletAddress, connect, hasMetaMask } = useWallet();
+  const { isConnected, isConnecting, walletAddress, connect, disconnect, hasMetaMask } = useWallet();
   const [step, setStep] = useState<"wallet" | "type">(isConnected ? "type" : "wallet");
 
   const handleWalletConnect = async () => {
@@ -63,8 +61,9 @@ export default function ConnectWallet() {
     navigate(from || href);
   };
 
-  const handleUserTypeSelect = (href: string) => {
-    navigate(href);
+  const handleDisconnect = () => {
+    disconnect();
+    setStep("wallet");
   };
 
   return (
@@ -79,54 +78,53 @@ export default function ConnectWallet() {
                 </div>
                 <h1 className="text-2xl font-bold text-foreground">Connect Your Wallet</h1>
                 <p className="mt-2 text-muted-foreground">
-                  Choose a wallet to connect to OpenCred
+                  Connect with MetaMask to access OpenCred
                 </p>
               </div>
 
               <Card>
-                <CardContent className="p-2">
-                  <div className="space-y-2">
-                    {walletOptions.map((wallet) => (
-                      <button
-                        key={wallet.id}
-                        onClick={() => handleWalletConnect(wallet.id)}
-                        disabled={isConnecting}
-                        className="flex w-full items-center justify-between rounded-lg p-4 text-left transition-colors hover:bg-secondary disabled:opacity-50"
-                      >
-                        <div className="flex items-center gap-4">
-                          <span className="text-3xl">{wallet.icon}</span>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-foreground">{wallet.name}</span>
-                              {wallet.popular && (
-                                <Badge variant="secondary" className="text-xs">
-                                  Popular
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-sm text-muted-foreground">{wallet.description}</p>
-                            <div className="mt-1 flex items-center gap-2">
-                              {wallet.platforms.includes("browser") && (
-                                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                                  <Laptop className="h-3 w-3" /> Browser
-                                </span>
-                              )}
-                              {wallet.platforms.includes("mobile") && (
-                                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                                  <Smartphone className="h-3 w-3" /> Mobile
-                                </span>
-                              )}
-                            </div>
+                <CardContent className="p-4">
+                  {!hasMetaMask ? (
+                    <div className="text-center py-6">
+                      <AlertCircle className="h-12 w-12 mx-auto text-warning mb-4" />
+                      <h3 className="font-semibold text-foreground mb-2">MetaMask Required</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Please install MetaMask to connect your wallet
+                      </p>
+                      <Button asChild>
+                        <a href="https://metamask.io/download/" target="_blank" rel="noopener noreferrer">
+                          Install MetaMask
+                          <ExternalLink className="ml-2 h-4 w-4" />
+                        </a>
+                      </Button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleWalletConnect}
+                      disabled={isConnecting}
+                      className="flex w-full items-center justify-between rounded-lg p-4 text-left transition-colors hover:bg-secondary disabled:opacity-50"
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className="text-3xl">🦊</span>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-foreground">MetaMask</span>
+                            <Badge variant="secondary" className="text-xs">
+                              Recommended
+                            </Badge>
                           </div>
+                          <p className="text-sm text-muted-foreground">
+                            Connect using MetaMask browser extension
+                          </p>
                         </div>
-                        {isConnecting && selectedWallet === wallet.id ? (
-                          <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                        ) : (
-                          <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
+                      </div>
+                      {isConnecting ? (
+                        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                      ) : (
+                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                      )}
+                    </button>
+                  )}
                 </CardContent>
               </Card>
 
@@ -140,7 +138,9 @@ export default function ConnectWallet() {
                       A wallet is your digital identity on the blockchain. It lets you own and control your credentials.
                     </p>
                     <a
-                      href="#"
+                      href="https://metamask.io/learn/"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                     >
                       Learn more about wallets
@@ -169,7 +169,7 @@ export default function ConnectWallet() {
                   <Card
                     key={type.id}
                     className="cursor-pointer transition-all hover:border-primary/30 hover:shadow-card-hover"
-                    onClick={() => handleUserTypeSelect(type.href)}
+                    onClick={() => handleUserTypeSelect(type.id, type.href)}
                   >
                     <CardContent className="flex items-center justify-between p-6">
                       <div className="flex items-center gap-4">
@@ -190,10 +190,14 @@ export default function ConnectWallet() {
               <div className="mt-6 text-center">
                 <p className="text-sm text-muted-foreground">
                   Connected as{" "}
-                  <span className="font-mono text-foreground">0x1234...5678</span>
+                  <span className="font-mono text-foreground">
+                    {walletAddress 
+                      ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+                      : "0x..."}
+                  </span>
                 </p>
                 <button
-                  onClick={() => setStep("wallet")}
+                  onClick={handleDisconnect}
                   className="mt-2 text-sm text-primary hover:underline"
                 >
                   Disconnect wallet
