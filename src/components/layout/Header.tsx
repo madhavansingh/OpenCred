@@ -6,10 +6,7 @@ import { useState } from "react";
 
 const navLinks = [
   { label: "How It Works", href: "/how-it-works" },
-  { label: "For Institutions", href: "/institutions" },
-  { label: "For Employers", href: "/employers" },
-  { label: "Security", href: "/security" },
-  { label: "Docs", href: "/docs" },
+  { label: "Verify Credential", href: "/verify" },
 ];
 
 export function Header() {
